@@ -2,6 +2,7 @@ var d3 = require('d3');
 require('./main.css');
 var BezierCurve = require('../lib/bezier-curve');
 var Rect = require('../lib/rect');
+var Line2D = require('../lib/line2d');
 
 var svg = d3.select('#example').append('svg')
   .attr({
@@ -119,97 +120,16 @@ mainLayer.selectAll('path.curves').data(curves)
 
   });
 
-function HomogeneousPoint(x, y, w) {
-  this.x = x;
-  this.y = y;
-  this.w = (w === undefined ? 1 : w);
-}
-
-// You must check this.w is not zero in advance.
-HomogeneousPoint.prototype.toPoint2D = function() {
-  return { x: this.x / this.w, y: this.y / this.w };
-}
-
-HomogeneousPoint.fromPoint2D = function(p1, p2) {
-  return new HomogeneousPoint(p1, p2);
-};
-
-HomogeneousPoint.getIntersection = function(l1, l2) {
-  return new HomogeneousPoint(
-    l1.b * l2.c - l2.b * l1.c,
-    l2.a * l1.c - l1.a * l2.c,
-    l1.a * l2.b - l2.a * l1.b
-  );
-};
-
-function HomogeneousLine(a, b, c) {
-  this.a = a;
-  this.b = b;
-  this.c = c;
-}
-
-HomogeneousLine.fromTwoHomogeneousPoints = function(p1, p2) {
-  return new HomogeneousLine(
-    p1.y * p2.w - p2.y * p1.w,
-    p2.x * p1.w - p1.x * p2.w,
-    p1.x * p2.y - p2.x * p1.y
-  );
-};
-
-function Line2D(p0, p1) {
-  this.p0 = p0;
-  this.p1 = p1;
-}
-
-Line2D.prototype.getParameterForPoint = function(pt) {
-  // pt = (1 - t) * p0 + t * p1
-  // -> t = (pt - p0) / (p1 - p0)
-  var p0 = this.p0;
-  var p1 = this.p1;
-  var tx = (pt.x - p0.x) / (p1.x - p0.x);
-  var ty = (pt.y - p0.y) / (p1.y - p0.y);
-  if (isNaN(tx)) {
-    return ty;
-  } else if (isNaN(ty)) {
-    return tx;
-  } else {
-    if (Math.abs(pt.x - p0.x) > Math.abs(pt.y - p0.y)) {
-      return tx;
-    } else {
-      return ty;
-    }
-  }
-};
 
 function calcuateIntersection() {
-  var homogeneousIntersection, intersection, line2ds, ts;
+  var intersection;
   var intersections = [];
   var lines = curves.map(function(curve) {
-    var points = curve.points.map(function(p) {
-      return HomogeneousPoint.fromPoint2D(p.x, p.y);
-    });
-    return HomogeneousLine.fromTwoHomogeneousPoints(points[0], points[1]);
+    return new Line2D(curve.points);
   });
-  lines.forEach(function(line, i) {
-    console.log('i', i, 'line', line);
-  });
-
-  homogeneousIntersection = HomogeneousPoint.getIntersection(lines[0], lines[1]);
-  console.log('homogeneous intersection', homogeneousIntersection);
-  if (homogeneousIntersection.w !== 0) {
-    intersection = homogeneousIntersection.toPoint2D();
-    console.log('intersection', intersection);
-    var line2ds = curves.map(function(curve) {
-      var points = curve.points;
-      return new Line2D(points[0], points[1]);
-    });
-
-    ts = line2ds.map(function(line2d) {
-      return line2d.getParameterForPoint(intersection);
-    });
-    if (0 <= ts[0] && ts[0] <= 1 && 0 <= ts[1] && ts[1] <= 1) {
-      intersections.push(intersection);
-    }
+  intersection = Line2D.getIntersection(lines[0], lines[1]);
+  if (intersection !== null) {
+    intersections.push(intersection);
   }
 
   var elems = intersectionLayer.selectAll('.intersection').data(intersections);
