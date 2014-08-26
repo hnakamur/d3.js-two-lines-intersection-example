@@ -1,0 +1,44 @@
+svg {
+  border: 1px solid black;
+}
+
+.curves {
+  stroke: black;
+  fill: none;
+}
+
+.control-line {
+  stroke: green;
+  fill: none;
+}
+
+.bbox0 {
+  stroke: blue;
+  stroke-width: 2;
+  fill: none;
+  opacity: 0.5;
+}
+
+.bbox1 {
+  stroke: orange;
+  stroke-width: 2;
+  fill: none;
+  opacity: 0.5;
+}
+
+.intersection {
+  stroke: none;
+  fill: blue;
+  opacity: 0.5;
+}
+
+.handle {
+  fill: red;
+  opacity: 0.5;
+  cursor: move;
+}
+
+.handle-text {
+  font-size: 12px;
+  font-family: 'Noto Sans Japanese', sans;
+}
