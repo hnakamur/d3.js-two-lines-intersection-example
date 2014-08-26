@@ -1,10 +1,12 @@
-d3.js-drag-bezier-curves-example
-================================
+d3.js-two-lines-intersection-example
+====================================
 
-an example of dragging control points of bezier curves using d3.js
+An example of calculating the intersection of two lines.
+It uses the algorithm described in "7.2.1 Homogeneous Points and Lines" in
+[Computer Aided Geometric Design Course Notes October 23. 2012]( tom.cs.byu.edu/~557/text/cagd.pdf ) by Dr. Thomas W. Sederberg.
 
 ## Demo
-http://hnakamur.github.io/d3.js-drag-bezier-curves-example
+http://hnakamur.github.io/d3.js-two-lines-intersection-example
 
 ## Develop
 
